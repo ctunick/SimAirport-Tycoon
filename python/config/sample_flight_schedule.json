@@ -1,0 +1,32 @@
+[
+  {
+    "flight_number": "SA123",
+    "airline": "SimAir",
+    "origin": "SIM-LAX",
+    "destination": "SIM-JFK",
+    "scheduled_departure": "2025-11-22T08:00:00Z",
+    "scheduled_arrival": "2025-11-22T16:00:00Z",
+    "gate": "A1",
+    "aircraft_type": "SimBus A320"
+  },
+  {
+    "flight_number": "FT456",
+    "airline": "FlyTycoon",
+    "origin": "SIM-ORD",
+    "destination": "SIM-MIA",
+    "scheduled_departure": "2025-11-22T09:30:00Z",
+    "scheduled_arrival": "2025-11-22T13:00:00Z",
+    "gate": "B3",
+    "aircraft_type": "SimJet 737"
+  },
+  {
+    "flight_number": "SA789",
+    "airline": "SimAir",
+    "origin": "SIM-SFO",
+    "destination": "SIM-LAX",
+    "scheduled_departure": "2025-11-22T11:00:00Z",
+    "scheduled_arrival": "2025-11-22T12:00:00Z",
+    "gate": "A2",
+    "aircraft_type": "SimBus A321"
+  }
+]
