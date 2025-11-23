@@ -9,7 +9,7 @@ namespace SimAirport.Building {
 	/// </summary>
 	public class BuildSystemService : MonoBehaviour {
 		[SerializeField]
-		private GridManager gridManager;
+		private SimAirport.Core.GridManager gridManager;
 
 		[SerializeField]
 		private EconomyManager economyManager;

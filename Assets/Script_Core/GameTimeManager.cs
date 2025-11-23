@@ -1,104 +1,63 @@
 using UnityEngine;
-using System;
 
 namespace SimAirport.Core {
-	/// <summary>
-	/// Manages simulation time, speed, and pausing.
-	/// Tracks time in minutes since midnight and advances every frame.
-	/// </summary>
-	public class GameTimeManager : MonoBehaviour {
-		[Header("Initial Time")]
-		[Tooltip("Initial time of day in minutes since midnight (e.g. 480 = 08:00).")]
-		[SerializeField] private float startTimeMinutes = 8f * 60f; // 08:00
+    /// <summary>
+    /// Manages simulation time (in minutes) and a local TimeScale for the sim clock.
+    /// World speed (movement, spawning) is controlled separately via Time.timeScale,
+    /// but TimeControls keeps them in sync.
+    /// </summary>
+    public class GameTimeManager : MonoBehaviour {
+        /// <summary>
+        /// Current simulation time in minutes.
+        /// </summary>
+        public float CurrentTimeMinutes { get; private set; }
 
-		[Header("Simulation Speed")]
-		[Tooltip("Base in-game minutes that pass per real-time second when TimeScale = 1.")]
-		[SerializeField] private float minutesPerSecond = 1f;
+        [Header("Start Time")]
+        [Tooltip("Hour of day to start at, e.g. 8 = 08:00")]
+        [SerializeField] private int startHour = 8;
 
-		/// <summary>
-		/// Current simulation time, in minutes since midnight.
-		/// Visible in Inspector for debugging.
-		/// </summary>
-		[field: SerializeField]
-		public float CurrentTimeMinutes { get; private set; }
+        /// <summary>
+        /// Simulation time scale (for the clock/HUD).
+        /// </summary>
+        public float TimeScale { get; private set; } = 1f;
 
-		/// <summary>
-		/// Multiplier applied on top of minutesPerSecond (0 = paused).
-		/// </summary>
-		public float TimeScale { get; private set; } = 1.0f;
+        private void Start() {
+            // Start the clock at startHour:00
+            CurrentTimeMinutes = startHour * 60f;
+        }
 
-		/// <summary>
-		/// Convenience property for current hour (0–23).
-		/// </summary>
-		public int CurrentHour => (int)(CurrentTimeMinutes / 60f) % 24;
+        private void Update() {
+            if (TimeScale <= 0f)
+                return;
 
-		/// <summary>
-		/// Convenience property for current minute (0–59).
-		/// </summary>
-		public int CurrentMinute => (int)(CurrentTimeMinutes % 60f);
+            // Sim minutes scale with our own TimeScale.
+            float deltaSimMinutes = Time.deltaTime * TimeScale;
+            CurrentTimeMinutes += deltaSimMinutes;
+        }
 
-		// Optional tick event if other systems want delta minutes.
-		// public static event Action<float> OnTick;
+        /// <summary>
+        /// Pause the sim clock (world pause is handled via Time.timeScale in TimeControls).
+        /// </summary>
+        public void Pause() {
+            TimeScale = 0f;
+        }
 
-#if UNITY_EDITOR || DEV_BUILD || TEST_BUILD
-		[Header("Debug")]
-		[SerializeField] private bool logTimeEverySecond = false;
+        /// <summary>
+        /// Set simulation clock speed (0 = paused, 1 = normal, >1 = faster).
+        /// </summary>
+        public void SetSpeed(float scale) {
+            TimeScale = Mathf.Clamp(scale, 0f, 10f);
+        }
 
-		private float _logTimer;
-#endif
+        // Helpers for HUD formatting
 
-		private void Awake() {
-			// Initialize sim time to the configured start.
-			CurrentTimeMinutes = startTimeMinutes;
-		}
+        public int CurrentHour =>
+            Mathf.FloorToInt(CurrentTimeMinutes / 60f) % 24;
 
-		private void Update() {
-			if (TimeScale <= 0f || minutesPerSecond <= 0f)
-				return;
+        public int CurrentMinute =>
+            Mathf.FloorToInt(CurrentTimeMinutes) % 60;
 
-			float deltaSimMinutes = Time.deltaTime * TimeScale * minutesPerSecond;
-			CurrentTimeMinutes += deltaSimMinutes;
-
-			// Wrap around at 24 hours to keep numbers reasonable.
-			if (CurrentTimeMinutes >= 24f * 60f)
-				CurrentTimeMinutes -= 24f * 60f;
-
-			// OnTick?.Invoke(deltaSimMinutes);
-
-#if UNITY_EDITOR || DEV_BUILD || TEST_BUILD
-			// Optional debug log once per real-time second.
-			if (logTimeEverySecond) {
-				_logTimer += Time.deltaTime;
-				if (_logTimer >= 1f) {
-					_logTimer = 0f;
-					Debug.Log($"[GameTime] {CurrentHour:00}:{CurrentMinute:00} ({CurrentTimeMinutes:F1} mins)");
-				}
-			}
-#endif
-		}
-
-		/// <summary>
-		/// Pause the simulation.
-		/// </summary>
-		public void Pause() => TimeScale = 0f;
-
-		/// <summary>
-		/// Resume the simulation at normal speed (TimeScale = 1).
-		/// </summary>
-		public void Resume() => TimeScale = 1f;
-
-		/// <summary>
-		/// Set the simulation speed multiplier.
-		/// </summary>
-		public void SetSpeed(float scale) {
-			TimeScale = Mathf.Clamp(scale, 0f, 10f);
-		}
-
-		/// <summary>
-		/// Set the current time of day (in minutes since midnight).
-		/// </summary>
-		public void SetTimeMinutes(float minutes) {
-			CurrentTimeMinutes = Mathf.Repeat(minutes, 24f * 60f);
-		}
-	}
+        public int CurrentSecond =>
+            Mathf.FloorToInt(CurrentTimeMinutes * 60f) % 60;
+    }
 }
