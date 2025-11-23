@@ -1,5 +1,3 @@
-# SimAirport-Tycoon
-
 # SimAirport Tycoon (Working Title)
 
 An open-source airport management & tycoon game built with **Unity** and **Python**, designed from day one to be:
