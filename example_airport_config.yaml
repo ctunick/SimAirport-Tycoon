@@ -1,0 +1,6 @@
+airport_id: "default_small"
+simulation_day_length_hours: 24
+
+flights:
+  count: 12
+  passengers_per_flight: [20, 50] # min, max
