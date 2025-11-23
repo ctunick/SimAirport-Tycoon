@@ -1,0 +1,12 @@
+{
+  "flights": [
+    {
+      "flightNumber": "SA1001",
+      "origin": "LAX",
+      "destination": "JFK",
+      "departureTimeLocal": "06:00",
+      "arrivalTimeLocal": "14:30",
+      "gate": "A1"
+    }
+  ]
+}
